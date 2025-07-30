@@ -1,0 +1,9 @@
+.edit-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.edit-btn {
+  background-color: #f8b400;
+  color: white;
+}

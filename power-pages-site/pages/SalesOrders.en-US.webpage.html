@@ -1,0 +1,150 @@
+<div class="row sectionBlockLayout text-start"
+  style="display: flex; flex-wrap: wrap; margin: 0px; min-height: auto; padding: 8px;">
+  <div class="container" style="display: flex; flex-wrap: wrap;">
+    <div class="col-lg-12 columnBlockLayout"
+      style="flex-grow: 1; display: flex; flex-direction: column; min-width: 250px; padding: 16px; margin: 60px 0px;">
+
+      {% fetchxml fetch_customers_users %}
+      <fetch top="1">
+        <entity name="cr26b_customersusers">
+          <attribute name="cr26b_cus" />
+          <filter>
+            <condition attribute="cr26b_user" operator="eq" value="{{ user.id }}" />
+          </filter>
+        </entity>
+      </fetch>
+      {% endfetchxml %}
+
+      {% if fetch_customers_users.results.entities.size > 0 %}
+      {% assign customer_id = fetch_customers_users.results.entities[0].cr26b_cus.id %}
+      {% fetchxml fetch_customer %}
+      <fetch top="1">
+        <entity name="mserp_custcustomerv3entity">
+          <attribute name="mserp_customeraccount" />
+          <filter>
+            <condition attribute="mserp_custcustomerv3entityid" operator="eq" value="{{ customer_id }}" />
+          </filter>
+        </entity>
+      </fetch>
+      {% endfetchxml %}
+
+      {% assign customerAccount = fetch_customer.results.entities[0].mserp_customeraccount %}
+
+      {% fetchxml mserp_salesorderheaderv4entity %}
+      <fetch distinct="false" mapping="logical" output-format="xml-platform" version="1.0">
+        <entity name="mserp_salesorderheaderv4entity">
+          <attribute name="mserp_salesorderheaderv4entityid" />
+          <attribute name="mserp_salesordernumber" />
+          <attribute name="mserp_salesordernumber" />
+          <attribute name="mserp_orderingcustomeraccountnumber" />
+          <attribute name="mserp_invoicecustomeraccountnumber" />
+          <attribute name="mserp_ordertotalamount" />
+          <attribute name="mserp_salesorderstatus" />
+          <attribute name="mserp_ordercreationdatetime" />
+          <attribute name="mserp_dataareaid" />
+          <attribute name="mserp_customerpaymentmethodname" />
+          <attribute name="mserp_currencycode" />
+          <attribute name="mserp_asseebworkflowstatus" />
+          <filter>
+            <condition operator="eq" attribute="mserp_invoicecustomeraccountnumber" value="{{ customerAccount }}" />
+          </filter>
+        </entity>
+      </fetch>
+      {% endfetchxml %}
+
+      {% if fetch_customer.results.entities.size > 0 %}
+      <h1>Sales Orders:</h1>
+      <br />
+
+      <div class="actions">
+        <a href="/Sales-Orders/Create-Sales-Order/" class="btn btn-primary">Create Sales Order</a>
+      </div>
+
+      <div class="filter-container">
+        <div class="filter-item">
+          <label for="searchOrderNumber">Order Number:</label>
+          <input id="searchOrderNumber" type="text" class="form-control" placeholder="Enter Order Number" />
+        </div>
+        <div class="filter-item">
+          <label for="searchOrderDate">Order Date:</label>
+          <input id="searchOrderDate" type="date" class="form-control" />
+        </div>
+        <div class="filter-item">
+          <button id="sortAsc" class="btn btn-secondary">Sort Ascending by Order Date</button>
+          <button id="sortDesc" class="btn btn-secondary">Sort Descending by Order Date</button>
+        </div>
+        <div class="filter-item">
+          <label for="searchOrderStatus">Order Status:</label>
+          <input id="searchOrderStatus" type="text" class="form-control" placeholder="Enter Order Status" />
+        </div>
+        <div class="filter-item">
+          <button id="clearFilters" class="btn btn-secondary">Clear Filters</button>
+        </div>
+      </div>
+
+
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Sales Order</th>
+              <th>Customer Account</th>
+              <th>Invoice Account</th>
+              <th>Order Created Time</th>
+              <th>Order Status</th>
+              <th>Total Amount</th>
+              <th>Payment Method</th>
+              <th>Currency code</th>
+              <th>Workflow Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for salesOrder in mserp_salesorderheaderv4entity.results.entities %}
+            <tr>
+              <td>
+                <a
+                  href="/Sales-Order-Lines?salesOrder={{ salesOrder.mserp_salesordernumber }}&dataAreaId={{ salesOrder.mserp_dataareaid }}">
+                  {{ salesOrder.mserp_salesordernumber }}
+                </a>
+              </td>
+              <td>{{ salesOrder.mserp_orderingcustomeraccountnumber }}</td>
+              <td>{{ salesOrder.mserp_invoicecustomeraccountnumber }}</td>
+              <td>{{ salesOrder.mserp_ordercreationdatetime }}</td>
+              <td>{{ salesOrder.mserp_salesorderstatus.Label }}</td>
+              <td>{{ salesOrder.mserp_ordertotalamount }}</td>
+              <td>{{ salesOrder.mserp_customerpaymentmethodname }}</td>
+              <td>{{ salesOrder.mserp_currencycode }}</td>
+              <td>{{ salesOrder.mserp_asseebworkflowstatus.Label }}</td>
+              <td>
+                <button class="edit-btn btn btn-secondary" data-id="{{ salesOrder.mserp_salesorderheaderv4entityid }}"
+                  data-order-status="{{ salesOrder.mserp_salesorderstatus.Label }}"
+                  data-order-number="{{ salesOrder.mserp_salesordernumber }}"
+                  data-invoice-account="{{ salesOrder.mserp_invoicecustomeraccountnumber }}"
+                  data-customer-account="{{ salesOrder.mserp_orderingcustomeraccountnumber }}"
+                  data-method-of-payment="{{ salesOrder.mserp_customerpaymentmethodname }}"
+                  data-workflow-status="{{ salesOrder.mserp_asseebworkflowstatus.Label }}"
+                  data-currency="{{ salesOrder.mserp_currencycode }}" data-area-id="{{ salesOrder.mserp_dataareaid }}">
+                  Edit
+                </button>
+                <button class="submit-btn btn btn-success" data-order-number="{{ salesOrder.mserp_salesordernumber }}">
+                  Submit
+                </button>
+                <button class="cancel-btn btn btn-success" data-order-number="{{ salesOrder.mserp_salesordernumber }}">
+                  Cancel
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <h1>No Sales order found with respect to this invoice account.</h1>
+      {% endif %}
+      {% else %}
+      <h1>No Assigned Customer found for this user</h1>
+      {% endif %}
+    </div>
+  </div>
+</div>
