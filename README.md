@@ -1,169 +1,90 @@
-🌐 Power Pages + Dynamics 365 F&O – Sales Order Management Portal
+# 🌐 Power Pages + Dynamics 365 F&O – Sales Order Management Portal
 
-This repository demonstrates a robust Sales Order Management Portal built using Microsoft Power Pages, Power Automate, and Dynamics 365 Finance & Operations (D365 F&O).
+This repository demonstrates a robust **Sales Order Management Portal** built using **Microsoft Power Pages**, **Power Automate**, and **Dynamics 365 Finance & Operations (D365 F&O)**.
 
-The portal is designed for Accounts Receivable (AR) operations, offering a seamless interface to:
+The portal is designed for **Accounts Receivable (AR)** operations and enables users to:
 
-📄 View, edit, submit, or cancel Sales Orders
+- 📄 View, create, edit, submit, or cancel Sales Orders
+- ✅ Trigger internal workflows in D365 F&O
+- ⛓ Filter Sales Order data by customer for each user
+- 🔐 Authenticate securely via Azure AD B2C
+- ⚙️ Manage integration with D365 via Virtual Entities and custom APIs
 
-✅ Trigger internal workflows in D365 F&O
+---
 
-⚙️ Create new Sales Orders using integrated custom forms
+## 📊 Key Functionalities
 
-⛓ Filter data per logged-in user/customer access using role-based security
+### 🔐 Secure Role-Based Login
+- Portal uses **Azure AD B2C** for secure authentication.
+- Users see only data tied to their assigned customer(s).
 
-📊 Key Functionalities
+### ⛰️ Customer-Based Data Filtering
+- Admins assign specific customers to users.
+- Sales orders are **filtered** based on these assignments.
 
-🔐 Secure Role-Based Login
+### 📉 Real-Time Sales Order Visibility
+- Sales order headers and lines shown via **Virtual Entities**.
+- Always displays up-to-date D365 F&O records.
 
-Users log in via secure Azure AD B2C authentication.
+### ✍️ Create & Edit Sales Orders
+- Use Power Pages custom forms to:
+  - Create new sales orders
+  - Edit existing orders with validation
+  - Manage Sales Lines using inline editors
 
-Only authorized users can access the portal.
+### ⏳ Submit & Cancel Workflows
+- Submit or cancel Sales Orders via the portal.
+- Triggers **Power Automate flows** that call D365 custom services.
 
-Role-based visibility restricts data access.
+---
 
-⛰️ Customer-Based Data Filtering
+## 🏗 Architecture & Integration
 
-Each user is assigned specific customers.
+| Component          | Description                                               |
+|-------------------|-----------------------------------------------------------|
+| Power Pages        | Frontend user portal                                      |
+| Dataverse          | Holds staging data and user-customer mappings             |
+| Power Automate     | Connects portal actions with D365 APIs                    |
+| D365 F&O           | Backend ERP – handles business logic & processing         |
+| Virtual Entities   | Real-time sync of Sales Orders from D365 F&O              |
+| Azure AD B2C       | Handles user login and access control                     |
 
-Sales Orders shown in the portal are filtered based on assigned customers.
+---
 
-📉 Real-Time Sales Order Visibility
+## 💡 Custom Forms & Tables
 
-View existing sales orders with customer-level filtering.
+This portal includes multiple **custom Power Pages forms** and **Dataverse tables** integrated with D365 F&O.
 
-Sales order headers and lines displayed via Virtual Entities.
+### 🔧 Custom Tables
+- `CustomSalesOrderHeader`
+- `CustomSalesOrderLine`
 
-✍️ Create and Edit Sales Orders
+These act as **staging buffers** before pushing data to D365 F&O.
 
-Create new sales orders using custom Power Pages forms.
-
-Edit existing orders inline using enhanced UX forms.
-
-Conditional fields, validation logic, and line-item editors included.
-
-⏳ Submit & Cancel Workflows
-
-Submit or cancel sales orders directly from the portal.
-
-Workflow triggers handled via Power Automate calling D365 custom services.
-
-💡 Architecture & Integration
-
-Component
-
-Description
-
-Power Pages
-
-Frontend user portal
-
-Dataverse
-
-Stores staging data, forms, and user access mappings
-
-Power Automate
-
-Connects portal with D365 custom service APIs
-
-D365 F&O
-
-Backend ERP for workflow and order logic
-
-Virtual Entities
-
-Live read-only sync of Sales Order data
-
-Azure AD B2C
-
-Handles user authentication & authorization
-
-💡 Custom Forms & Tables for Sales Order Management
-
-This portal includes multiple custom Power Pages forms and custom Dataverse tables tailored for deep integration with D365 F&O's Sales Order process:
-
-🔧 Custom Tables
-
-CustomSalesOrderHeader
-
-CustomSalesOrderLine
-
-These tables mirror the structure of D365 F&O entities and act as staging buffers before syncing with the ERP system.
-
-📜 Custom Forms
-
-Create Sales Order – collects header & line information
-
-Edit Sales Order – supports inline edits, validation, and updates
-
-Sales Line Manager – manage multiple line items with row-level logic
-
-Approval Trigger – initiate internal workflows for selected orders
+### 📜 Custom Forms
+- **Create Sales Order** – collects header & line info
+- **Edit Sales Order** – supports inline edits
+- **Sales Line Manager** – add/edit multiple lines
+- **Approval Trigger** – submits/cancels sales orders
 
 Each form includes:
+- Validation logic
+- Conditional visibility
+- Real-time sync via Power Automate
 
-Validation logic
+---
 
-Conditional visibility
+## 📁 File Structure
 
-Power Automate integration for real-time sync
-
-📁 File Structure
-
-/SalesOrderPortal/
+PowerPages_SalesOrderPortal/
 │
-├── /power-pages-site/              # Power Pages web files (HTML, Liquid, JS)
-│   ├── /pages/
-│   │   ├── Customers.en-US.webpage.html
-│   │   ├── SalesOrderLines.en-US.webpage.html
-│   │   ├── EditSalesOrderLines.en-US.webpage.html
-│   │   ├── Editsalesorderheader.en-US.webpage.html
-│   │   ├── CreateSalesOrder.en-US.webpage.html
-│   │   └── SalesOrders.en-US.webpage.html
-│   ├── /scripts/
-│   │   ├── SalesOrders.en-US.customjs.js
-│   │   └── SalesOrderLines.en-US.customjs
-│   ├── /styles/
-│   │   ├── SalesOrderLines.en-US.customcss
-│   │   └── SalesOrders.en-US.customcss.css
-│
-├── /power-automate-flows/         # Power Automate flows (ZIP or JSON)
-│   ├── SubmitSalesOrderFlow.zip
-│   ├── TriggerApprovalFlow.zip
-│
-├── /d365fo-api/                    # D365FO custom service contracts/classes
-│   ├── SalesOrderServiceContract.xpp
-│   ├── SalesOrderServiceController.xpp
-│
-├── /screenshots/                   # Portal and flow screenshots
-│   ├── login.png
-│   ├── sales-order-list1.png
-│   ├── sales-order-list2.png
-│   ├── create-form.png
-│   ├── EditSalesOrder.png
-│   ├── Customers.png
-│   ├── EditSalesOrderLines.png
-│   ├── SalesOrderLines.png
-│
+├── power-pages-site/
+│   ├── pages/
+│   ├── scripts/
+│   └── styles/
+├── power-automate-flows/
+├── d365fo-api/
+├── screenshots/
 ├── README.md
 ├── LICENSE
 └── .gitignore
-
-📷 Screenshots
-
-🔓 Secure Login
-
-
-
-🔍 Filtered Sales Order List
-
-
-
-➕ Create New Sales Order Form
-
-
-
-🌐 Power Automate Flow Trigger
-
-
-
